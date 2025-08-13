@@ -1,44 +1,57 @@
 import smtplib
-from email.message import EmailMessage
-import ssl
+from email.mime.text import MIMEText
+from email.mime.multipart import MIMEMultipart
+from email.header import Header
+from config import SMTP_SERVER, SMTP_PORT, EMAIL_SENDER, SENDER_PASSWORD
 
-# --- 邮件配置 ---
-# 替换成你自己的信息
-EMAIL_SENDER = "bifeng_zhe@qq.com"  # 你的发件邮箱
-EMAIL_PASSWORD = "tiowakznihlujibc"  # 你的邮箱授权码 (不是登录密码!)
-EMAIL_RECEIVER = "bifeng_zhe@outlook.com"  # 收件人邮箱
+# 收件人信息
+RECIPIENT_EMAIL = "bifeng_zhe@outlook.com"  # 对方的邮箱地址
 
 # --- 邮件内容 ---
-subject = "Python 邮件测试"
-body = """
-你好！
+def send_email(subject, body, recipient=RECIPIENT_EMAIL):
+    """发送邮件的核心函数"""
 
-这是一封通过 Python 脚本自动发送的邮件。
-祝好！
-"""
+    # 1. 创建一个带附件的实例
+    message = MIMEMultipart()
+    message['From'] = EMAIL_SENDER
+    message['To'] = recipient
+    message['Subject'] = Header(subject, 'utf-8')
 
-# 创建一个 EmailMessage 对象
-em = EmailMessage()
-em['From'] = EMAIL_SENDER
-em['To'] = EMAIL_RECEIVER
-em['Subject'] = subject
-em.set_content(body)
+    # 2. 邮件正文内容 (纯文本)
+    message.attach(MIMEText(body, 'plain', 'utf-8'))
 
-# 使用 SSL 加密连接，更安全
-context = ssl.create_default_context()
+    # 3. 连接到 SMTP 服务器并发送邮件
+    try:
+        print("正在连接到 SMTP 服务器...")
+        # 使用 SSL 加密的 SMTP
+        server = smtplib.SMTP_SSL(SMTP_SERVER, SMTP_PORT)
 
-# --- 连接到 SMTP 服务器并发送邮件 ---
-# 注意：不同的邮箱服务商，SMTP 服务器地址和端口可能不同
-# QQ邮箱: smtp.qq.com, 端口 465
-# 163邮箱: smtp.163.com, 端口 465
-# Gmail: smtp.gmail.com, 端口 465
-try:
-    with smtplib.SMTP_SSL("smtp.qq.com", 465, context=context) as smtp:
-        print("正在登录邮箱...")
-        smtp.login(EMAIL_SENDER, EMAIL_PASSWORD)
-        print("登录成功！正在发送邮件...")
-        smtp.send_message(em)
+        print("正在登录...")
+        server.login(EMAIL_SENDER, SENDER_PASSWORD)
+
+        print("正在发送邮件...")
+        server.sendmail(EMAIL_SENDER, [recipient], message.as_string())
+
         print("邮件发送成功！")
-except Exception as e:
-    print(f"邮件发送失败，错误信息: {e}")
 
+    except smtplib.SMTPException as e:
+        print(f"邮件发送失败，错误信息: {e}")
+    finally:
+        if 'server' in locals() and server:
+            server.quit()
+            print("已关闭服务器连接。")
+
+
+# --- 主程序入口 ---
+if __name__ == "__main__":
+    email_subject = "一封来自 Python 的测试邮件"
+    email_body = """
+    你好！
+
+    这是一封通过 Python 自动化脚本发送的邮件。
+    如果能收到，说明脚本工作正常！
+
+    祝好，
+    你的 Python 机器人
+    """
+    send_email(email_subject, email_body, recipient=RECIPIENT_EMAIL)
