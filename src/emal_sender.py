@@ -30,7 +30,7 @@ def send_email(subject, body, recipient=RECIPIENT_EMAIL):
         server.login(EMAIL_SENDER, SENDER_PASSWORD)
 
         print("正在发送邮件...")
-        server.sendmail(EMAIL_SENDER, [recipient], message.as_string())
+        server.sendmail(EMAIL_SENDER, [recipient] if isinstance(recipient, str) else recipient, message.as_string())
 
         print("邮件发送成功！")
 
