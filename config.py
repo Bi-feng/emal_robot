@@ -1,5 +1,6 @@
 import os
 from dotenv import load_dotenv
+from pathlib import Path
 
 load_dotenv()
 try:
@@ -8,5 +9,13 @@ try:
     SMTP_PORT = int(os.getenv("SMTP_PORT", 465)) # 提供一个默认值
     EMAIL_SENDER = os.getenv("EMAIL_SENDER")
     SENDER_PASSWORD = os.getenv("EMAIL_PASSWORD") # 授权码而非邮箱密码
+    EMAIL_RECEIVER = os.getenv("EMAIL_RECEIVER")
+
+    # dirvers
+    PROJECT_ROOT = Path(__file__).resolve().parent
+    DRIVER_PATH = PROJECT_ROOT / "drivers" / "msedgedriver.exe"
+
+    # URLs
+    QIUSHI_URL = os.getenv("QIUSHI_URL")
 except:
     print("读取配置失败")
