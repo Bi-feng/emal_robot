@@ -8,7 +8,7 @@ from config import SMTP_SERVER, SMTP_PORT, EMAIL_SENDER, SENDER_PASSWORD
 RECIPIENT_EMAIL = "bifeng_zhe@outlook.com"  # 对方的邮箱地址
 
 # --- 邮件内容 ---
-def send_email(subject, body, recipient=RECIPIENT_EMAIL):
+def send_email(subject, body, recipient):
     """发送邮件的核心函数"""
 
     # 1. 创建一个带附件的实例
