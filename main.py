@@ -1,4 +1,4 @@
-from src import send_email, scrape_qiushi_articles
+from src import send_email, scrape_qiushi_journal
 from config import QIUSHI_URL, EMAIL_RECEIVER
 
 def format_articles_for_email(articles: list[dict]) -> str:
@@ -17,7 +17,7 @@ def format_articles_for_email(articles: list[dict]) -> str:
 if __name__ == '__main__':
     print("--- 开始执行《求是》网文章抓取任务 ---")
     # 1. 调用抓取函数
-    articles = scrape_qiushi_articles(QIUSHI_URL)
+    articles = scrape_qiushi_journal(QIUSHI_URL)
     # 2. 检查结果并发送邮件
     if articles:
         print("文章目录获取成功，正在准备邮件...")
@@ -40,10 +40,4 @@ if __name__ == '__main__':
         )
     else:
         print("获取文章目录失败，任务中止。")
-        # 你也可以在这里发送一封失败警报邮件
-        # send_email(
-        #     recipient=EMAIL_RECEIVER,
-        #     subject="【警报】《求是》网抓取任务失败",
-        #     body="尝试抓取《求是》网最新文章目录时发生错误，请检查日志。"
-        # )
     print("--- 任务执行完毕 ---")
