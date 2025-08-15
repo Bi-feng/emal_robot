@@ -17,5 +17,8 @@ try:
 
     # URLs
     QIUSHI_URL = os.getenv("QIUSHI_URL")
+
+    # Data
+    DATA_PATH = PROJECT_ROOT / "data"
 except:
     print("读取配置失败")
