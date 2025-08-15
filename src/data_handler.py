@@ -8,22 +8,6 @@ JOURNALS_DICT = DATA_PATH / 'journals'
 os.makedirs(JOURNALS_DICT, exist_ok=True)
 JOURNALS_FILE = JOURNALS_DICT / 'journals.json'
 
-def load_sent_urls() -> set:
-    """
-    从 JSON 文件中加载已经发送过的 URL。
-    如果文件不存在，返回一个空集合。
-    使用集合 (set) 是为了快速查找。
-    """
-
-    try:
-        with open(DATA_FILE, 'r', encoding='utf-8') as f:
-            urls = json.load(f)
-            return set(urls)
-    except (json.JSONDecodeError, IOError):
-        # 如果文件损坏或为空，也返回空集合
-        return set()
-
-
 def load_journal_data() -> list[dict]:
     """
     从 JSON 文件中加载完整的期刊文章数据。
