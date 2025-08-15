@@ -1,2 +1,4 @@
 python-dotenv
 selenium
+openai
+markdown2

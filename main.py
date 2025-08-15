@@ -4,6 +4,7 @@ from config import QIUSHI_URL, EMAIL_RECEIVER, DATA_PATH
 import os
 from tqdm import tqdm
 
+
 def scrape_all():
     """抓取《求是》全部文章并发送邮件。"""
     articles = scrape_qiushi_journal(QIUSHI_URL)
@@ -38,7 +39,6 @@ def format_articles_for_email(articles: list[dict]) -> str:
 
 if __name__ == '__main__':
     print("--- 开始执行《求是》网文章抓取任务 ---")
-    scrape_all()
     # 1. 调用抓取函数
     articles = scrape_qiushi_journal(QIUSHI_URL)
     # 2. 保存结果

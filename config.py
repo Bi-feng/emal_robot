@@ -20,5 +20,7 @@ try:
 
     # Data
     DATA_PATH = PROJECT_ROOT / "data"
+
+    AI_API_KEY = os.getenv("AI_API_KEY")
 except:
     print("读取配置失败")
