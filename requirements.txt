@@ -3,3 +3,4 @@ selenium
 openai
 markdown2
 tenacity
+arxiv
