@@ -1,0 +1,5 @@
+python-dotenv
+selenium
+openai
+markdown2
+tenacity
