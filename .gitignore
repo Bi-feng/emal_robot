@@ -209,3 +209,4 @@ drivers/
 data/
 run_main.sh
 cron.log
+.vscode/
