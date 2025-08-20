@@ -147,7 +147,7 @@ def arxiv_robot():
         if len(papers) != 0:
             paper_generator = ArxivHtmlGenerator()
             for j,paper in enumerate(papers):
-                print(f"\n    {j+1}.正在生成 {paper['title']} 的卡片...")
+                print(f"    {j+1}.正在生成 {paper['title']} 的卡片...")
                 ai_comments = process_paper_with_ai(paper['title'], paper['abstract'])
                 paper_data = {
                     'title_zh': ai_comments['title_zh'],
