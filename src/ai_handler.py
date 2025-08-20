@@ -13,7 +13,7 @@ from tenacity import retry, stop_after_attempt, wait_random_exponential, retry_i
         InternalServerError     # 服务器内部错误 (5xx)，正是你遇到的问题
     ))
 )
-def generate_content(text: str) -> str:
+def generate_content(text: str, prompt: str) -> str:
     """
     :param text: str: 文本
     :return: str：生成的HTML内容
@@ -27,7 +27,7 @@ def generate_content(text: str) -> str:
             model="gemini-2.5-pro",
             messages=[
                 {"role": "system",
-                "content": "你是一个求是杂志解读员，擅长用通俗易懂的语言讲解总结出杂志内容，并能读懂杂志的文字中的暗示，并能给出辅助用户经济决策的信息。"},
+                "content": f"{prompt}"},
                 {"role": "user", "content": f"{text}"},
             ],
             timeout=100,
@@ -40,5 +40,5 @@ def generate_content(text: str) -> str:
 if __name__ == '__main__':
     with open(r'D:\code\robot\data\journals\《求是》2025年第15期\求是专访│下半年中国经济走势怎么看？.txt', 'r', encoding='utf-8') as f:
         text = f.read()
-    html_content = generate_content(text)
+    html_content = generate_content(text,"你是一个求是杂志解读员，擅长用通俗易懂的语言讲解总结出杂志内容，并能读懂杂志的文字中的暗示，并能给出辅助用户经济决策的信息。")
     print(html_content)
