@@ -104,7 +104,7 @@ def qiushi_robot():
                     </div>
                     <div class="section ai-analysis">
                         <h2>AI分析</h2>
-                        {generate_content(text)}
+                        {generate_content(text,"你是一个求是杂志解读员，擅长用通俗易懂的语言讲解总结出杂志内容，并能读懂杂志的文字中的暗示，并能给出辅助用户经济决策的信息。")}
                         
                     </div>
                     <p>祝好！<br>你的自动化助手</p>
