@@ -1,10 +1,11 @@
 import arxiv
 from datetime import datetime, timedelta, timezone
 
-def fetch_daily_arxiv_papers(categories:list[str], keywords:list[str], authors:list[str] = None):
+def fetch_daily_arxiv_papers(categories:list[str], keywords:list[str], authors:list[str] = None)->list[dict]:
     """
     获取昨天在指定领域内，且标题或摘要包含指定关键词的论文。
 
+    :param authors: list of str, e.g., ["John Doe", "Jane Smith"]
     :param categories: list of str, e.g., ['cs.CV','cs.LG']
     :param keywords: list of str, e.g., ["diffusion model", "large language model"]
     """
@@ -16,7 +17,7 @@ def fetch_daily_arxiv_papers(categories:list[str], keywords:list[str], authors:l
     category_queries = [f'cat:{cat}' for cat in categories]
     category_query_part = " OR ".join(category_queries)
 
-    author_queries = [f'au:"{au}"' for au in authors]
+    author_queries = [f'au:"{au}"' for au in authors] if authors else []
     author_query_part =" OR  ".join(author_queries) if authors is not None else None
 
     # 2. 组合领域和关键词查询

@@ -87,6 +87,9 @@ try:
     os.makedirs(DATA_PATH / "arxiv", exist_ok=True)
     ARXIV_PATH = DATA_PATH / "arxiv" / "arxiv.json"
     create_arxiv_template(ARXIV_PATH)
+    ARXIV_HTML_TEMPLATE = PROJECT_ROOT / "src" / "resource" / "arxiv.html"
+    PAPER_CARD_TEMPLATE = PROJECT_ROOT / "src" / "resource" / "paper_card.html"
+
 
 except:
     print("读取配置失败")

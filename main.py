@@ -1,11 +1,15 @@
-from src import scrape_website_title, scrape_qiushi_articles, scrape_articles_text, scrape_qiushi_journal
+from src import scrape_qiushi_articles, scrape_articles_text, scrape_qiushi_journal
 from src import save_journal_urls, load_journal_data, save_article_urls,load_article_data
-from src import text_to_html, generate_content,send_html_email
-from src import fetch_daily_arxiv_papers
-from config import QIUSHI_URL, EMAIL_RECEIVER, DATA_PATH, ARXIV_PATH
+from src import text_to_html, generate_content,send_html_email, process_paper_with_ai
+from src import fetch_daily_arxiv_papers, ArxivHtmlGenerator
+from config import QIUSHI_URL, EMAIL_RECEIVER, DATA_PATH, ARXIV_PATH,ARXIV_HTML_TEMPLATE
 import os
 from tqdm import tqdm
+import json
+from datetime import datetime
 
+today = datetime.now()
+now_date = today.strftime("%Y年%m月%d日")
 
 def scrape_all():
     """抓取《求是》全部文章并发送邮件。"""
@@ -119,10 +123,55 @@ def qiushi_robot():
 
     save_journal_urls(journals)
 
-if __name__ == '__main__':
-    # qiushi_robot()
+def arxiv_robot():
+    with open(ARXIV_PATH, 'r', encoding='utf-8') as f:
+        arxiv_config = json.load(f)
+    # 遍历收件人列表
+    for i,recipient in enumerate(arxiv_config['recipients']):
+        name = recipient.get('name', '未知')
+        email = recipient['email']
+        user_config = recipient['config']
+        print(f"--- 开始执行{i+1}. {name}({email}) 的 arXiv 文章抓取任务 ---")
+        categories = user_config['categories']
+        keywords = user_config['keywords']
+        authors = user_config.get('authors',None)
+        print(f"  订阅领域 (Categories): {', '.join(categories) if categories else '无'}")
+        print(f"  订阅关键词 (Keywords): {', '.join(keywords) if keywords else '无'}")
+        # 对 authors 进行特殊处理，因为它可能是 null
+        if authors is None:
+            print("  订阅作者 (Authors): 不追踪特定作者")
+        else:
+            print(f"  订阅作者 (Authors): {', '.join(authors) if authors else '无'}")
+        papers = fetch_daily_arxiv_papers(categories,keywords,authors)
+        print(f"抓取到 {len(papers)} 篇文章")
+        if len(papers) != 0:
+            paper_generator = ArxivHtmlGenerator()
+            for j,paper in enumerate(papers):
+                print(f"\n    {j+1}.正在生成 {paper['title']} 的卡片...")
+                ai_comments = process_paper_with_ai(paper['title'], paper['abstract'])
+                paper_data = {
+                    'title_zh': ai_comments['title_zh'],
+                    'title_en': paper['title'],
+                    'authors': paper['authors'],
+                    'abstract_zh': ai_comments['abstract_zh'],
+                    'ai_analysis': ai_comments['ai_analysis'],
+                    'pdf_url': paper['pdf_url'],
+                    'id': paper['id']
+                }
+                paper_generator.create_paper_card(paper_data)
 
-    pass
+            html_email = paper_generator.generate_arxiv_email()
+            send_html_email([email],f"{now_date} arXiv 文章推送", html_email)
+            print(f"已发送至{name} ({email})")
+        else:
+            print(f"没有新文章，跳过...")
+
+if __name__ == '__main__':
+    qiushi_robot()
+    arxiv_robot()
+
+
+
 
 
 
