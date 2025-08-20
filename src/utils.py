@@ -1,4 +1,6 @@
 import html
+import json
+import os
 def text_to_html(plain_text: str) -> str:
     """
     将纯文本转换为适合在 HTML 中安全显示的格式。
@@ -13,3 +15,5 @@ def text_to_html(plain_text: str) -> str:
     escaped_text = html.escape(plain_text)
 
     return f"<pre>{escaped_text}</pre>"
+
+

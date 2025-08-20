@@ -1,7 +1,8 @@
 from src import scrape_website_title, scrape_qiushi_articles, scrape_articles_text, scrape_qiushi_journal
 from src import save_journal_urls, load_journal_data, save_article_urls,load_article_data
 from src import text_to_html, generate_content,send_html_email
-from config import QIUSHI_URL, EMAIL_RECEIVER, DATA_PATH
+from src import fetch_daily_arxiv_papers
+from config import QIUSHI_URL, EMAIL_RECEIVER, DATA_PATH, ARXIV_PATH
 import os
 from tqdm import tqdm
 
@@ -119,7 +120,9 @@ def qiushi_robot():
     save_journal_urls(journals)
 
 if __name__ == '__main__':
-    qiushi_robot()
+    # qiushi_robot()
+
+    pass
 
 
 
