@@ -1,34 +1,45 @@
 import arxiv
 from datetime import datetime, timedelta, timezone
-from tqdm import tqdm
 
-def fetch_daily_arxiv_papers():
+def fetch_daily_arxiv_papers(categories:list[str], keywords:list[str], authors:list[str] = None):
     """
-    获取昨天在指定领域内新提交到 arXiv 的所有论文。
-    """
-    # 1. 定义你感兴趣的领域
-    # 可以从 arXiv 官网找到所有领域的缩写
-    target_categories = "cs.CV"
-    query = f"cat:({target_categories})"
+    获取昨天在指定领域内，且标题或摘要包含指定关键词的论文。
 
-    # 2. 设置搜索参数
-    # 按提交日期降序排序，获取最新的论文
-    client = arxiv.Client()
+    :param categories: list of str, e.g., ['cs.CV','cs.LG']
+    :param keywords: list of str, e.g., ["diffusion model", "large language model"]
+    """
+    # 1. 构建关键词查询部分
+    # 搜索范围是标题(ti)或摘要(abs)
+    keyword_queries = [f'(ti:"{kw}" OR abs:"{kw}")' for kw in keywords]
+    keyword_query_part = " OR ".join(keyword_queries)
+
+    category_queries = [f'cat:{cat}' for cat in categories]
+    category_query_part = " OR ".join(category_queries)
+
+    author_queries = [f'au:"{au}"' for au in authors]
+    author_query_part =" OR  ".join(author_queries) if authors is not None else None
+
+    # 2. 组合领域和关键词查询
+    # 使用 AND 将两者连接，表示必须同时满足
+    if author_query_part is not None:
+        query = f"({category_query_part}) AND (({author_query_part}) OR ({keyword_query_part}))"
+    else:
+        query = f"({category_query_part}) AND ({keyword_query_part})"
+
+
     search = arxiv.Search(
         query=query,
-        max_results=100,
+        max_results=100,  # 结果会少很多，不需要设太大
         sort_by=arxiv.SortCriterion.SubmittedDate,
         sort_order=arxiv.SortOrder.Descending
     )
+    client = arxiv.Client()
 
-    # 3. 在客户端按日期过滤
-    # 获取昨天的日期。注意处理时区问题，arXiv 使用的是 UTC 时间。
+    # 3. 同样在客户端按日期过滤，确保是昨天发布的
     yesterday_utc = datetime.now(timezone.utc) - timedelta(days=1)
-    
+
     candidate_papers = []
-    for result in tqdm(client.results(search)):
-        # result.published 和 result.updated 都是带时区的 datetime 对象
-        # 我们关心的是初次提交的日期
+    for result in client.results(search):
         if result.published.date() == yesterday_utc.date():
             paper_data = {
                 "id": result.entry_id,
@@ -37,19 +48,17 @@ def fetch_daily_arxiv_papers():
                 "authors": [author.name for author in result.authors],
                 "pdf_url": result.pdf_url,
                 "published_date": result.published.date(),
-                "comments": result.comment # 这个字段非常重要，常包含会议信息
+                "comments": result.comment  # 这个字段非常重要，常包含会议信息
             }
             candidate_papers.append(paper_data)
-        # 因为结果是按日期降序的，一旦日期早于昨天，就可以停止了
         elif result.published.date() < yesterday_utc.date():
             break
-    
-    print(f"成功获取 {len(candidate_papers)} 篇昨日发布的候选论文。")
     return candidate_papers
 
 # 运行函数
 if __name__ == "__main__":
-    daily_papers = fetch_daily_arxiv_papers()
+    daily_papers = fetch_daily_arxiv_papers(["cs.CV"],["shadow removal", "image restoration"])
+    print(f"找到{len(daily_papers)}篇论文")
     for paper in daily_papers:
         print(f"标题: {paper['title']}")
         print(f"作者: {', '.join(paper['authors'])}")
