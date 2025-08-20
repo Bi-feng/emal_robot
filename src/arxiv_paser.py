@@ -1,5 +1,6 @@
 import arxiv
 from datetime import datetime, timedelta, timezone
+from tqdm import tqdm
 
 def fetch_daily_arxiv_papers():
     """
@@ -7,14 +8,15 @@ def fetch_daily_arxiv_papers():
     """
     # 1. 定义你感兴趣的领域
     # 可以从 arXiv 官网找到所有领域的缩写
-    target_categories = "cs.CV OR cs.LG OR cs.AI OR cs.CL OR stat.ML"
+    target_categories = "cs.CV"
     query = f"cat:({target_categories})"
 
     # 2. 设置搜索参数
     # 按提交日期降序排序，获取最新的论文
+    client = arxiv.Client()
     search = arxiv.Search(
         query=query,
-        max_results=500,  # 设置一个足够大的数字以覆盖一天的论文量
+        max_results=100,
         sort_by=arxiv.SortCriterion.SubmittedDate,
         sort_order=arxiv.SortOrder.Descending
     )
@@ -24,7 +26,7 @@ def fetch_daily_arxiv_papers():
     yesterday_utc = datetime.now(timezone.utc) - timedelta(days=1)
     
     candidate_papers = []
-    for result in search.results():
+    for result in tqdm(client.results(search)):
         # result.published 和 result.updated 都是带时区的 datetime 对象
         # 我们关心的是初次提交的日期
         if result.published.date() == yesterday_utc.date():
