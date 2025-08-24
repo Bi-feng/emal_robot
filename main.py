@@ -44,7 +44,7 @@ def format_articles_for_email(articles: list[dict]) -> str:
     return body
 
 def qiushi_robot():
-    print("--- 开始执行《求是》网文章抓取任务 ---")
+    print("\n --- 开始执行《求是》网文章抓取任务 ---\n")
     # 1. 调用抓取函数
     journals = scrape_qiushi_journal(QIUSHI_URL)
     # 2. 保存结果
@@ -124,6 +124,7 @@ def qiushi_robot():
     save_journal_urls(journals)
 
 def arxiv_robot():
+    print("\n --- 开始执行 arXiv 文章推送任务 ---\n")
     with open(ARXIV_PATH, 'r', encoding='utf-8') as f:
         arxiv_config = json.load(f)
     # 遍历收件人列表
