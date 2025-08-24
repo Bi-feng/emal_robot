@@ -144,27 +144,25 @@ def arxiv_robot():
             print(f"  订阅作者 (Authors): {', '.join(authors) if authors else '无'}")
         papers = fetch_daily_arxiv_papers(categories,keywords,authors)
         print(f"抓取到 {len(papers)} 篇文章")
-        if len(papers) != 0:
-            paper_generator = ArxivHtmlGenerator()
-            for j,paper in enumerate(papers):
-                print(f"    {j+1}.正在生成 {paper['title']} 的卡片...")
-                ai_comments = process_paper_with_ai(paper['title'], paper['abstract'])
-                paper_data = {
-                    'title_zh': ai_comments['title_zh'],
-                    'title_en': paper['title'],
-                    'authors': paper['authors'],
-                    'abstract_zh': ai_comments['abstract_zh'],
-                    'ai_analysis': ai_comments['ai_analysis'],
-                    'pdf_url': paper['pdf_url'],
-                    'id': paper['id']
-                }
-                paper_generator.create_paper_card(paper_data)
 
-            html_email = paper_generator.generate_arxiv_email()
-            send_html_email([email],f"{now_date} arXiv 文章推送", html_email)
-            print(f"已发送至{name} ({email})")
-        else:
-            print(f"没有新文章，跳过...")
+        paper_generator = ArxivHtmlGenerator()
+        for j,paper in enumerate(papers):
+            print(f"    {j+1}.正在生成 {paper['title']} 的卡片...")
+            ai_comments = process_paper_with_ai(paper['title'], paper['abstract'])
+            paper_data = {
+                'title_zh': ai_comments['title_zh'],
+                'title_en': paper['title'],
+                'authors': paper['authors'],
+                'abstract_zh': ai_comments['abstract_zh'],
+                'ai_analysis': ai_comments['ai_analysis'],
+                'pdf_url': paper['pdf_url'],
+                'id': paper['id']
+            }
+            paper_generator.create_paper_card(paper_data)
+
+        html_email = paper_generator.generate_arxiv_email()
+        send_html_email([email],f"{now_date} arXiv 文章推送", html_email)
+        print(f"已发送至{name} ({email})")
 
 if __name__ == '__main__':
     qiushi_robot()
