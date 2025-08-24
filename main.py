@@ -66,7 +66,7 @@ def qiushi_robot():
         txt_path = os.path.join(DATA_PATH, 'journals', f"{journal_title}", f"{title}.txt")
         
         if x in latest_articles_list:
-            print(f"{title} 已存在，跳过...")
+            print(f"《{title}》 已存在，跳过...")
             continue
         else:
             print(f"正在抓取 《{title}》...")
